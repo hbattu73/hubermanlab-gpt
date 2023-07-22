@@ -11,6 +11,7 @@ from logging.config import dictConfig
 from sse_starlette.sse import EventSourceResponse
 from fastapi import status, BackgroundTasks, Request, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
 
 from config import settings
 from pinecone_db import PineconeDB
@@ -39,7 +40,13 @@ async def lifespan(app: FastAPI):
     g.set_default("ada_client", ada_client)
     g.set_default("gpt_client", gpt_client)
     # Initialize connection to Redis
-    connection = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    # connection = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    connection = redis.Redis(
+        host='usw1-unbiased-stingray-33643.upstash.io',
+        port=33643,
+        password='5a3bd41eefb543c988ec22afe00b95a7',
+        ssl=True
+    )
     # connection = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
     g.set_default("redis_client", connection)
     logger.info(f"Ping successful: {await connection.ping()}")
