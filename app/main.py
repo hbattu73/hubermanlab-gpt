@@ -11,7 +11,6 @@ from logging.config import dictConfig
 from sse_starlette.sse import EventSourceResponse
 from fastapi import status, BackgroundTasks, Request, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from mangum import Mangum
 
 from config import settings
 from pinecone_db import PineconeDB
@@ -24,8 +23,7 @@ from globals import g, GlobalsMiddleware
 dictConfig(settings.logger.dict())
 logger = logging.getLogger(settings.logger_name)
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+def startup() -> None:
     # Initialize connection to Pinecone
     pinecone_db = PineconeDB()
     g.set_default("pinecone_db", pinecone_db)
@@ -40,41 +38,59 @@ async def lifespan(app: FastAPI):
     g.set_default("ada_client", ada_client)
     g.set_default("gpt_client", gpt_client)
     # Initialize connection to Redis
-    # connection = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
     connection = redis.Redis(
         host='usw1-unbiased-stingray-33643.upstash.io',
         port=33643,
         password='5a3bd41eefb543c988ec22afe00b95a7',
         ssl=True
     )
-    # connection = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
     g.set_default("redis_client", connection)
-    logger.info(f"Ping successful: {await connection.ping()}")
     logger.info("App initialized!")
-    yield
+
+async def shutdown() -> None:
+    logger.info("Shutting down...")
     # Clean up the ML models and release the resources
-    await hf_client.aclose()
-    await ada_client.aclose()
-    await gpt_client.aclose()
-    await connection.flushall(asynchronous=True)
-    await connection.close()
+    await g.hf_client.aclose()
+    await g.ada_client.aclose()
+    await g.gpt_client.aclose()
+    await g.redis_client.flushall(asynchronous=True)
+    await g.redis_client.close()
     g.cleanup()
+    logger.info("Cleaned up resources...")
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    startup()
+    yield
+    await shutdown()
 
-app = FastAPI(
-    title=settings.title,
-    description=settings.description,
-    version=settings.version,
-    lifespan=lifespan
-)
-app.add_middleware(GlobalsMiddleware)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
+def create_app() -> FastAPI:
+    app = None
+    if settings.aws_env:
+        app = FastAPI(
+            title=settings.title,
+            description=settings.description,
+            version=settings.version
+        )
+        startup()
+    else:
+        app = FastAPI(
+            title=settings.title,
+            description=settings.description,
+            version=settings.version,
+            lifespan=lifespan
+        )
+    app.add_middleware(GlobalsMiddleware)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
+    )
+    return app
+
+app = create_app()
 
 async def get_cache(query: Query) -> None | tuple[dict[str, list], None | list[float]]:
     cache = await g.redis_client.exists(query.text.lower())
@@ -107,10 +123,11 @@ async def query(payload: Query, background_tasks: BackgroundTasks) -> Any:
     return EventSourceResponse(gpt_comp, media_type='text/event-stream')
 
 @app.get("/", status_code=status.HTTP_200_OK)
-def healthcheck(request: Request):
+async def healthcheck(request: Request):
     return {
         "title": request.app.title,
         "description": request.app.description,
         "version": request.app.version,
+        "redis_ping": await g.redis_client.ping(),
         "health": "All is well!"
     }
