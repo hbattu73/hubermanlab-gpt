@@ -1,0 +1,38 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/home/hbattu/projects/huberman-gpt/huberman-audio/mp3/tmpvc145kin.mp4':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6mp41
+    creation_time   : 2021-09-22T16:28:26.000000Z
+  Duration: 02:52:04.73, start: 0.000000, bitrate: 129 kb/s
+    Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 0 kb/s (default)
+    Metadata:
+      creation_time   : 2021-09-22T16:28:26.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+Stream mapping:
+  Stream #0:0 -> #0:0 (aac (native) -> mp3 (libmp3lame))
+Press [q] to stop, [?] for help
+[graph_0_in_0_0 @ 0x55a68d8f6dc0] tb:1/44100 samplefmt:fltp samplerate:44100 chlayout:0x3
+Output #0, mp3, to '../huberman-audio/mp3/GzvzWO0NU50.mp3':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6mp41
+    TSSE            : Lavf58.29.100
+    Stream #0:0(und): Audio: mp3 (libmp3lame), 44100 Hz, stereo, fltp, delay 1105 (default)
+    Metadata:
+      creation_time   : 2021-09-22T16:28:26.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      encoder         : Lavc58.54.100 libmp3lame
+No more output streams to write to, finishing.
+size=  161325kB time=02:52:04.74 bitrate= 128.0kbits/s speed=96.8x    
+[AVIOContext @ 0x55a68d7df900] Statistics: 0 seeks, 214 writeouts
+video:0kB audio:161324kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000209%
+Input file #0 (/home/hbattu/projects/huberman-gpt/huberman-audio/mp3/tmpvc145kin.mp4):
+  Input stream #0:0 (audio): 444649 packets read (165195673 bytes); 444649 frames decoded (455320576 samples); 
+  Total: 444649 packets (165195673 bytes) demuxed
+Output file #0 (../huberman-audio/mp3/GzvzWO0NU50.mp3):
+  Output stream #0:0 (audio): 395244 frames encoded (455320576 samples); 395245 packets muxed (165196277 bytes); 
+  Total: 395245 packets (165196277 bytes) muxed
+[AVIOContext @ 0x55a68d80f040] Statistics: 2 seeks, 632 writeouts
+[AVIOContext @ 0x55a68d7e8880] Statistics: 167094993 bytes read, 0 seeks

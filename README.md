@@ -1,16 +1,14 @@
 # Running Locally
-## With Docker
+## With AWS SAM
 ```
-# Build image and start the container
-docker compose up
+# Build image
+sam build --use-container
+# Deploy locally
+sam local invoke
 ```
 ## With Uvicorn
 ```
-pip install -r requirements.txt
-redis-server
-```
-```
-# Run the following in a new terminal
 cd app/
+pip install -r requirements.txt
 uvicorn main:app --reload
 ```
