@@ -30,6 +30,8 @@ class LogConfig(BaseSettings):
     }
 
 class Settings(BaseSettings):
+    # AWS Deployment Stuff
+    aws_env: bool = True
     # FastAPI Stuff
     title: str = "hubermanGPT"
     description: str = "Generative QA App on the Huberman Lab Podcast"
@@ -60,12 +62,9 @@ class Settings(BaseSettings):
     logger_name: str = os.getenv("LOGGER_NAME")
     log_level: str = os.getenv("LOG_LEVEL")
     logger: LogConfig = LogConfig()
-    # TODO: ADD SOME STUFF FOR RATE LIMITS
     stream_retry_timeout: int = 3000   # milliseconds
-    # TODO: ADD CORS ORIGINS WHEN YOU GET TO THAT PART
     origins: list = [
-        "http://localhost",
-        "http://localhost:5173"
+        "*"
     ]
 
 settings = Settings()

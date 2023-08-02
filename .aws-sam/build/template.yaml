@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'FastAPI app for hubermanGPT
+
+  '
+Globals:
+  Function:
+    Timeout: 60
+Resources:
+  FastAPIFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      MemorySize: 2048
+      Environment:
+        Variables:
+          HOME: /tmp
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          AWS_LWA_INVOKE_MODE: response_stream
+          PORT: 8000
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: RESPONSE_STREAM
+      ImageUri: fastapifunction:python3.10-v1
+    Metadata:
+      DockerContext: /home/hbattu/projects/hubermanlab-gpt/app
+      DockerTag: python3.10-v1
+      Dockerfile: Dockerfile
+      SamResourceId: FastAPIFunction
+Outputs:
+  FastAPIFunctionUrl:
+    Description: Function URL for FastAPI app
+    Value:
+      Fn::GetAtt:
+      - FastAPIFunctionUrl
+      - FunctionUrl
+  FastAPIFunction:
+    Description: FastAPI Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - FastAPIFunction
+      - Arn
