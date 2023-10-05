@@ -1,5 +1,5 @@
 import os
-from pydantic import BaseSettings
+from pydantic.v1 import BaseSettings
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,24 +9,24 @@ class LogConfig(BaseSettings):
     logger_name: str = os.getenv("LOGGER_NAME")
     log_level: str = os.getenv("LOG_LEVEL")
     log_format: str = "%(levelprefix)s | %(asctime)s | %(message)s"
-    version = 1
-    disable_existing_loggers = False
-    formatters = {
+    version: int = 1
+    disable_existing_loggers: bool = False
+    formatters: dict = {
         "default": {
             "()": "uvicorn.logging.DefaultFormatter",
             "fmt": log_format,
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     }
-    handlers = {
+    handlers: dict = {
         "default": {
             "formatter": "default",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stderr",
         },
     }
-    loggers = {
-        logger_name: {"handlers": ["default"], "level": log_level},
+    loggers: dict = {
+        logger_name: {"handlers": ["default"], "level": log_level, "propagate": False},
     }
 
 class Settings(BaseSettings):
@@ -57,7 +57,14 @@ class Settings(BaseSettings):
     gpt_endpoint: str = "https://api.openai.com/v1/chat/completions"
     gpt_sys_message: str = "You are a helpful AI agent designed to help users better understand the content of the episodes in the Huberman Lab podcast. Your task is to answer the subsequent query to the best of your ability by using the following passages from your podcast, which are delimited by triple quotes. If the answer cannot be found, write 'Unfortunately, I don't believe I've covered that topic in my podcast. Please note that my podcast is limited to neuroscience and its connections to human perception, behavior and health.' Crucially, be accurate, concise, and clear."
     # Redis Stuff
+    redis_host: str = os.getenv("REDIS_HOST")
+    redis_password: str = os.getenv("REDIS_PASSWORD")
+    redis_port: int = 33643
+    ssl: bool = True
     expiry_time: int = 120
+    # Supabase Stuff
+    supabase_url: str = os.getenv("SUPABASE_URL")
+    supabase_key: str = os.getenv("SUPABASE_KEY")
     # Logging Stuff
     logger_name: str = os.getenv("LOGGER_NAME")
     log_level: str = os.getenv("LOG_LEVEL")

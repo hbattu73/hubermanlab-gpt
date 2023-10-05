@@ -9,7 +9,6 @@ from config import settings
 from globals import g
 from schemas import Passage, Query, Message
 
-
 logger = logging.getLogger(settings.logger_name)
 
 # Zero-shot classify if query is a question or search term

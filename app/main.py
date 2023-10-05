@@ -2,6 +2,7 @@ import torch
 import logging
 import json
 import redis.asyncio as redis
+from supabase import create_client, Client
 
 from httpx import AsyncClient
 from pinecone_text.sparse import SpladeEncoder
@@ -38,13 +39,21 @@ def startup() -> None:
     g.set_default("ada_client", ada_client)
     g.set_default("gpt_client", gpt_client)
     # Initialize connection to Redis
-    connection = redis.Redis(
-        host='usw1-unbiased-stingray-33643.upstash.io',
-        port=33643,
-        password='5a3bd41eefb543c988ec22afe00b95a7',
-        ssl=True
+    redis_client = redis.Redis(
+        host = settings.redis_host,
+        port = settings.redis_port,
+        password = settings.redis_password,
+        ssl = settings.ssl
     )
-    g.set_default("redis_client", connection)
+    g.set_default("redis_client", redis_client)
+    logger.info("Connected to Redis client...")
+    # Initialize connection to Supabase
+    supabase: Client = create_client(
+        settings.supabase_url,
+        settings.supabase_key
+    )
+    g.set_default("supabase", supabase)
+    logger.info("Connected to Supabase DB...")
     logger.info("App initialized!")
 
 async def shutdown() -> None:

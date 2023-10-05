@@ -9,6 +9,8 @@ class Message(BaseModel):
 
 class Passage(BaseModel):
     video_id: str
+    video_description: str
+    video_tags: list
     start: str
     end: str
     clip_url: HttpUrl
